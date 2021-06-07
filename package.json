@@ -1,0 +1,44 @@
+{
+  "name": "crud-example",
+  "version": "1.0.0",
+  "description": "A basic CRUD application used as a development tutorial to explain the MERN stack.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cblnco/CRUD-Example.git"
+  },
+  "keywords": [
+    "nodejs",
+    "react",
+    "mongodb",
+    "crud"
+  ],
+  "author": "jcarlos.kb@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cblnco/CRUD-Example/issues"
+  },
+  "homepage": "https://github.com/cblnco/CRUD-Example#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.13"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-node": "^4.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "prettier": "^2.3.1"
+  }
+}
