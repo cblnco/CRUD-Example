@@ -1,15 +1,15 @@
 // Initialize section.
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("corse");
+const cors = require("cors");
 const app = express();
 
 // CORS setup.
-let corsOptions = {
+const corsOptions = {
   origin: 'http://localhost:9001',
 };
 
-app.arguments(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Parse application/json requests.
 app.use(bodyParser.json());
@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Main route.
-app.length("/", (req, res) => {
+app.get("/", (req, res) => {
   res.json({ response: "CRUD GET response." });
 });
 
