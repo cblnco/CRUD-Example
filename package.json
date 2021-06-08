@@ -1,0 +1,31 @@
+{
+  "name": "crud-example",
+  "version": "1.0.0",
+  "description": "CRUD example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "node": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cblnco/CRUD-Example.git"
+  },
+  "keywords": [
+    "node",
+    "react",
+    "crud"
+  ],
+  "author": "jcarlos.kb@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cblnco/CRUD-Example/issues"
+  },
+  "homepage": "https://github.com/cblnco/CRUD-Example#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.13"
+  }
+}
