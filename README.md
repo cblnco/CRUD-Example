@@ -1,81 +1,71 @@
-# Session 1: Working with a NodeJS server.
+# Session 2: Working with Cypress.
 
 ## Prerequisites:
 
 ```
-Nodejs v12+.
-npm.
-Personal GitHub repository.
-Code editor of your preference.
-Postman.
+Cypress.
 ```
 
 ## Steps for this session:
 
-1. Create a GitHub reporitory in your account, name it however you want and include a README.md file.
-2. Create a `.gitignore` file in the root directory with the following line:
+1. Install Cypress with the following command:
+```bash
+npm install --save-dev cypress
+```
+2. Create a folder with the name `cypress` in the root directory of the project.
 
-```.gitignore
-/node_modules
+3. Create a file called `placeholder.test.js` inside of the previous folder with the following code:
+```js
+describe('Test JSONPlaceholder API', () => {
+    // More info about this API: https://jsonplaceholder.typicode.com/guide/.
+    Cypress.config("baseUrl","https://jsonplaceholder.typicode.com");
+
+    it('Verify post 55', () => {
+        cy.request({
+            method: 'GET',
+            url: "/posts/55"
+        }).then((response) => {
+            expect(response).have.property('userId', 6);
+            expect(response.body).to.not.be.null;
+        });
+    });
+
+    it('Updates post 55', () => {
+        const data = { 
+            id: 1,
+            title: 'Test title',
+            body: 'Sample body',
+            userId: 1,
+        };
+
+        cy.request('PUT', "/posts/55", data).then((response) => {
+            expect(response).have.property('title', data.title);
+            expect(response).have.property('body', data.body);
+            expect(response).have.property('userId', data.userId);
+        });
+    });
+
+    it('Creates post 77', () => {
+        const data = { 
+            id: 77,
+            title: '77th Post',
+            body: 'Hello world',
+            userId: 5,
+        };
+
+        cy.request('POST', "/posts/55", data).its('status').should('eq', 204);
+    });
+});
 ```
 
-3. Execute the `npm init` command and answer the questions accordingly, at the end of the execution you'll have a `package.json` file.
 4. Run the following command:
 
 ```bash
-npm install -S body-parser cors express mongoose
+npx cypress open
 ```
-
-5. Create a `server.js` file in the root of your project with the following content.
-
-```js
-// Initialize section.
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const app = express();
-
-// CORS setup.
-const corsOptions = {
-	origin: "http://localhost:9001",
-};
-
-app.use(cors(corsOptions));
-
-// Parse application/json requests.
-app.use(bodyParser.json());
-
-// Parse urlencoded requests.
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Main route.
-app.get("/", (req, res) => {
-	res.json({ response: "CRUD GET response." });
-});
-
-// Server port to listen requests.
-const PORT = process.env.PORT || 9001;
-
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
-});
-```
-
-6. Add a script in `package.json` to run the node server:
-
-```json
-"scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "node": "node server.js"
-  },
-```
-
-7. Open a terminal in the prohect directory and run the previous script with `npm run node`.
-
-8. Make a `GET` request to http://localhost:9001/ with your browser and then with Postman.
 
 ## Extra steps:
 
-- Add a `PUT`, `POST`, `PATCH` and a `DELETE` handlers in `server.js`.
-- Send an unique response in each one of them.
-- Make requests with Postman to the local server and retrieve the answer of each of them.
+- Test positive and negative scenarios.
+- Test a different entity on the API.
+- Visit [Cypress website](https://docs.cypress.io/guides/references/assertions#TDD-Assertions) to learn more about assertions.
