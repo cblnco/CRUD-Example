@@ -1,73 +1,116 @@
-# Session 2: Working with Cypress.
-
-## Prerequisites:
-
-```
-Cypress.
-```
+# Session 3: MongoDB model.
 
 ## Steps for this session:
 
-1. Install Cypress with the following command:
+1. create the following directory structure:
 ```bash
-npm install --save-dev cypress
+crud > config
 ```
-2. Create a folder with this directory struicture `cypress > integration > examples` in the root directory of the project.
-
-3. Create a file called `placeholder.spec.js` inside of the previous `examples` folder with the following code:
+2. Create a `db.config.js` file inside `config` with the following code:
 ```js
-describe('Test JSONPlaceholder API', () => {
-  // More info about this API: https://jsonplaceholder.typicode.com/guide/.
-  Cypress.config("baseUrl","https://jsonplaceholder.typicode.com");
+module.exports = {
+  url: "mongodb://localhost:27017/crud_db"
+};
+```
 
-  it('Verify post 55', () => {
-      cy.request({
-          method: 'GET',
-          url: "/posts/55"
-      })
-      .then((response) => {
-          expect(response.body).to.not.be.null;
-          expect(response.body).have.property('userId', 6);
-      });
-  });
+3. Add a `models` direcotry inside `crud` and create an `index.js` file with the following code:
+```js
+// More info about this API: https://jsonplaceholder.typicode.com/guide/.
+const dbConfig = require("../config/db.config.js");
 
-  it('Updates post 55', () => {
-      const data = { 
-          id: 1,
-          title: 'Test title',
-          body: 'Sample body',
-          userId: 1,
-      };
+const mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
 
-      cy.request('PUT', "/posts/55", data).then((response) => {
-          const { body } = response;
-          expect(body).have.property('title', data.title);
-          expect(body).have.property('body', data.body);
-          expect(body).have.property('userId', data.userId);
-      });
-  });
+const db = {};
+db.mongoose = mongoose;
+db.url = dbConfig.url;
+db.person = require("./person.model.js")(mongoose);
 
-  it('Creates post 77', () => {
-      const data = { 
-          id: 77,
-          title: '77th Post',
-          body: 'Hello world',
-          userId: 5,
-      };
+module.exports = db;
+```
 
-      cy.request('POST', "/posts/", data).its('status').should('eq', 201);
-  });
+4. Add this conten in `server.js`.
+```js
+const db = require("./crud/models");
+
+db.mongoose
+  .connect(db.url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("Successfully connected to the db!");
+  })
+  .catch(err => {
+    console.log("Error while connecting to the db.", err);
+    process.exit();
 });
 ```
 
-4. Run the following command:
+5. Add a `person.model.js` inside `crud/models` with this code:
+```js
+module.exports = mongoose => {
+  var schema = mongoose.Schema(
+    {
+      name: String,
+      job: String,
+      address: String,
+      phone: Number,
+      hasKids: Boolean
+    },
+    { timestamps: true }
+  );
 
-```bash
-npx cypress open
+  schema.method("toJSON", function() {
+    const { __v, _id, ...object } = this.toObject();
+    object.id = _id;
+    return object;
+  });
+
+  const Person = mongoose.model("person", schema);
+  return Person;
+};
 ```
 
-## Extra steps:
+6. Create a `crontrollers` directory inside of `crud`.
 
-- Test positive and negative scenarios.
-- Test a different entity on the API.
-- Visit [Cypress website](https://docs.cypress.io/guides/references/assertions#TDD-Assertions) to learn more about assertions.
+7. Now add a `person.controller.js` file inside of the `controllers` directory with this content:
+```js
+const db = require("../models");
+const Person = db.person;
+
+// Create and Save a new person.
+exports.create = (req, res) => {
+  
+};
+
+// Retrieve all people from the database.
+exports.findAll = (req, res) => {
+  
+};
+
+// Find a single person with an specific id.
+exports.findOne = (req, res) => {
+  
+};
+
+// Update a person by the id in the request.
+exports.update = (req, res) => {
+  
+};
+
+// Delete a person with the specified id in the request.
+exports.delete = (req, res) => {
+  
+};
+
+// Delete all people from the database.
+exports.deleteAll = (req, res) => {
+  
+};
+
+// Find any person who has kids.
+exports.findAllKids = (req, res) => {
+  
+};
+```
