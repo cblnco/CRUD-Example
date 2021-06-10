@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const db = require("./crud/models");
 const app = express();
 
 // CORS setup.
@@ -37,6 +38,20 @@ app.patch("/", (req, res) => {
 app.delete("/", (req, res) => {
 	res.json({ response: "The person was Deleted successfully." });
 });
+
+db.mongoose
+  .connect(db.url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("Successfully connected to the db!");
+  })
+  .catch(err => {
+    console.log("Error while connecting to the db.", err);
+    process.exit();
+});
+
 // Server port to listen requests.
 const PORT = process.env.PORT || 9001;
 
