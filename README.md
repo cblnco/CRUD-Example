@@ -1,5 +1,8 @@
 # Session 4: Implementing controllers.
 
+### Prerequisites:
+[Studio 3T](https://studio3t.com/download/?source=robomongo&medium=homepage)
+
 ## Steps for this session:
 
 1. Add the following code into in the `create` controller:
