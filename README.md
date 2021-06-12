@@ -23,7 +23,7 @@
   });
 
   // Save the new person in the database.  
-  Person
+  person
     .save(person)
     .then(data => {
       res.send(data);
@@ -165,7 +165,7 @@ module.exports = app => {
   router.get("/", people.findAll);
 
   // Retrieve all people with kids.
-  router.get("/published", people.findAllKids);
+  router.get("/hasKids", people.findAllKids);
 
   // Retrieve a single person with an specific id.
   router.get("/:id", people.findOne);
