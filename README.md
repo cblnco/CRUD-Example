@@ -26,7 +26,12 @@ npx create-react-app <name-of-your-app>
 
 7. Install the following Carbon Design System dependencies:
 ```bash
-npm install carbon-components@10.25.0 carbon-components-react@7.25.0 @carbon/icons-react@10.22.0 carbon-icons@7.0.7 sass@1.29.0
+yarn add carbon-components@10.25.0 carbon-components-react@7.25.0 @carbon/icons-react@10.22.0 carbon-icons@7.0.7 sass@1.29.0
+```
+
+8. Run the previously created React application with this command:
+```bash
+yarn start
 ```
 
 8. Create a `.env` with the following content:

@@ -2,7 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const db = require("./crud/models");
+const db = require("./models");
 const app = express();
 
 // CORS setup.
@@ -52,7 +52,7 @@ db.mongoose
     process.exit();
 });
 
-require("./crud/routes/person.routes")(app);
+require("./routes/person.routes")(app);
 
 // Server port to listen requests.
 const PORT = process.env.PORT || 9001;
