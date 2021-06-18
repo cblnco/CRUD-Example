@@ -1,116 +1,119 @@
-# Session 6: Retrieving resources from an API.
+# Session 7: Render data on the UI.
 
 ## Steps for this session:
 
-1. Install axios on your front-end project direcotyr with the following command:
-```bash
-yarn add axios
+1. Fix CORS problem in our code by adding a `proxy` entry in `package.json` file:
+```json
+"proxy": "<Your_API_URL>",
 ```
 
-3. Start your react application with `yar start`.
-
-4. Remove the sample `create-react-app` code in the `App.js` unti you have something like this:
-```jsx
-<div className="App">
-     
-</div>
-```
-
-5. Now import the `Header` component from the `carbon-components-react` package:
-```jsx
-import {Header, HeaderName } from 'carbon-components-react';
-....
-<div className="App">
-  <Header aria-label="IBM Platform Name">
-    <HeaderName href="#" prefix="CRUD">
-      Sample Application
-    </HeaderName>
-  </Header>
-</div>
-```
-
-6. Now we will start to create the files needed to fetch API data. Create an `utils` directory under `src`.
-
-7. Add a `http-common.js` file with the following content:
+2. Update the `http-common.js` file by adding `/api` in the `baseURL` property:
 ```js
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "/api", // /api is replacing the previous URL.
   headers: {
     "Content-type": "application/json"
   }
 });
-
 ```
 
-8. Create a `services` folder under `src`.
-
-9. Now add a `PersonService.js` file in the previously created `services` directory:
+3. Now make a named import in our `PersonService.js` file to solve the ESLint warning:
 ```js
-import http from "../http-common";
-
-const getAll = () => {
-  return http.get("/person");
-};
-
-const get = id => {
-  return http.get(`/person/${id}`);
-};
-
-const create = data => {
-  return http.post("/person", data);
-};
-
-const update = (id, data) => {
-  return http.put(`/person/${id}`, data);
-};
-
-const remove = id => {
-  return http.delete(`/person/${id}`);
-};
-
-export default {
+....
+const PersonService = {
   getAll,
   get,
   create,
   update,
   remove,
 };
+
+export default PersonService;
 ```
 
-10. Import the `PersonService.js` file and start retrieving data:
-```js
-PersonDataService.create(data)
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-```
+4. Save the previous changes and now the application will be able to consume the MongoDB API data.
 
-11. Use the `PersonService` object to fetch data when you click a button:
+5. Import `useState` in the `App.js` file and initialize an object that coontains all the registered entries in the API like so:
 ```jsx
+import { useState } from 'react';
+// ...
 function App() {
+
+  // We initialize the people array.
+  const [people, setPeople] = useState([]);  
 
   const onFetch = () => {
     PersonService.getAll()
     .then(response => {
-      console.log(response.data);
+      // Here we set data to our empty array and update it with the setPeople function.
+      setPeople(response.data);
     })
     .catch(e => {
       console.log("Something wrong happened");
     });
   };
+ // ...
+}
+```
 
-  return (
-    <div className="App">
+6. In order to render our content we will need to put it in a `StructuredList` which is a Carbon Design System component:
+
+```jsx
+import { 
+  Header, 
+  HeaderName, 
+  Button,
+  // Below of this line are all the required components of the StructuredList collection.
+  StructuredListWrapper,
+  StructuredListHead,
+  StructuredListBody,
+  StructuredListRow,
+  StructuredListCell,
+ } from 'carbon-components-react';
+```
+
+7. Now add a function called `getPersonData` in order to put all the information retrieved from the MongoDB API:
+```jsx
+const getNames = () => (people.map(({name, job, address}) => (
+    <StructuredListRow label>
+      <StructuredListCell>{name}</StructuredListCell>
+      <StructuredListCell>{job}</StructuredListCell>
+      <StructuredListCell>{address}</StructuredListCell>
+    </StructuredListRow>   
+)));
+```
+
+8. We need to integrate the `StructuredList` components in the return section of `App.js` (the `<br />` tags are temporal, we will remove them when using the Carbon Grid):
+```jsx
+<div className="App">
       <Header aria-label="IBM Platform Name">
         <HeaderName href="#" prefix="CRUD">
           Sample Application
         </HeaderName>
       </Header>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      { people.length > 0 && (
+        <StructuredListWrapper>
+          <StructuredListHead>
+            <StructuredListRow head>
+              <StructuredListCell head>Name</StructuredListCell>
+              <StructuredListCell head>Job</StructuredListCell>
+              <StructuredListCell head>Address</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListHead>
+          <StructuredListBody>
+            {getPersonData()}
+          </StructuredListBody>
+        </StructuredListWrapper>
+      )}
       <br />
       <br />
       <br />
@@ -118,27 +121,45 @@ function App() {
         Fetch
       </Button>
     </div>
-  );
-}
 ```
 
-11. At the end the `App.js` file should look like this:
+9. The `App.js` file should look like this after all these changes we made:
 ```jsx
-import {Header, HeaderName, Button } from 'carbon-components-react';
+import { useState } from 'react';
+import { 
+  Header, 
+  HeaderName, 
+  Button,
+  StructuredListWrapper,
+  StructuredListHead,
+  StructuredListBody,
+  StructuredListRow,
+  StructuredListCell,
+ } from 'carbon-components-react';
 import PersonService from './services/PersonService';
 import './App.css';
 
 function App() {
 
+  const [people, setPeople] = useState([]);
+
   const onFetch = () => {
     PersonService.getAll()
     .then(response => {
-      console.log(response.data);
+      setPeople(response.data);
     })
     .catch(e => {
       console.log("Something wrong happened");
     });
   };
+
+  const getPersonData = () => (people.map(({name, job, address}) => (
+    <StructuredListRow label>
+      <StructuredListCell>{name}</StructuredListCell>
+      <StructuredListCell>{job}</StructuredListCell>
+      <StructuredListCell>{address}</StructuredListCell>
+    </StructuredListRow>   
+  )));
 
   return (
     <div className="App">
@@ -147,6 +168,27 @@ function App() {
           Sample Application
         </HeaderName>
       </Header>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      { people.length > 0 && (
+        <StructuredListWrapper>
+          <StructuredListHead>
+            <StructuredListRow head>
+              <StructuredListCell head>Name</StructuredListCell>
+              <StructuredListCell head>Job</StructuredListCell>
+              <StructuredListCell head>Address</StructuredListCell>
+            </StructuredListRow>
+          </StructuredListHead>
+          <StructuredListBody>
+            {getPersonData()}
+          </StructuredListBody>
+        </StructuredListWrapper>
+      )}
       <br />
       <br />
       <br />
@@ -158,4 +200,5 @@ function App() {
 }
 
 export default App;
+
 ```
