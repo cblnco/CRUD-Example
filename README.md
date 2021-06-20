@@ -1,204 +1,152 @@
-# Session 7: Render data on the UI.
+# Session 8: Carbon Design system grid.
+
+## Optional extensions.:
+
+- [Prettier extension for VSCode.](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
 ## Steps for this session:
 
-1. Fix CORS problem in our code by adding a `proxy` entry in `package.json` file:
-```json
-"proxy": "<Your_API_URL>",
+1. Install Carbon grid with the following command:
+
+```bash
+yarn add @carbon/grid@10.17.0
 ```
 
-2. Update the `http-common.js` file by adding `/api` in the `baseURL` property:
-```js
-import axios from "axios";
+2. The grid uses 12 columns by default, in this project we will use the 16 column grid with this code in our `index.scss` file:
 
-export default axios.create({
-  baseURL: "/api", // /api is replacing the previous URL.
-  headers: {
-    "Content-type": "application/json"
-  }
-});
+```scss
+$feature-flags: (
+  grid-columns-16: true,
+);
+
+// Make sure to enable the 16 column grid before this line that imports all of the Carbon styles.
+@import 'carbon-components/scss/globals/scss/styles.scss';
 ```
 
-3. Now make a named import in our `PersonService.js` file to solve the ESLint warning:
-```js
-....
-const PersonService = {
-  getAll,
-  get,
-  create,
-  update,
-  remove,
-};
+3. To avoid Carbon styles clashing with Create React App style we're going to delete the following files including their impors on the project:
 
-export default PersonService;
+```
+ui-crud/src/App.css
+ui-crud/src/index.css
 ```
 
-4. Save the previous changes and now the application will be able to consume the MongoDB API data.
+4. Also remove the `ui-crud/src/logo.svg` file since we're not going to use it.
 
-5. Import `useState` in the `App.js` file and initialize an object that coontains all the registered entries in the API like so:
-```jsx
-import { useState } from 'react';
-// ...
-function App() {
+5. Save the previous changes and start your application with `yarn start`.
 
-  // We initialize the people array.
-  const [people, setPeople] = useState([]);  
+6. Create an `App.scss` file in the `src` directory with the following content:
 
-  const onFetch = () => {
-    PersonService.getAll()
-    .then(response => {
-      // Here we set data to our empty array and update it with the setPeople function.
-      setPeople(response.data);
-    })
-    .catch(e => {
-      console.log("Something wrong happened");
-    });
-  };
- // ...
+```scss
+@import 'carbon-components/scss/globals/scss/vendor/@carbon/layout/scss/breakpoint.scss';
+@import 'carbon-components/scss/globals/scss/vars.scss';
+
+.app__grid {
+  padding-top: $spacing-05 * 7;
 }
 ```
 
-6. In order to render our content we will need to put it in a `StructuredList` which is a Carbon Design System component:
+7. Now we need to reference the Carbon Grid styles in our `App.js` code like this:
 
 ```jsx
-import { 
-  Header, 
-  HeaderName, 
-  Button,
-  // Below of this line are all the required components of the StructuredList collection.
-  StructuredListWrapper,
-  StructuredListHead,
-  StructuredListBody,
-  StructuredListRow,
-  StructuredListCell,
- } from 'carbon-components-react';
-```
-
-7. Now add a function called `getPersonData` in order to put all the information retrieved from the MongoDB API:
-```jsx
-const getNames = () => (people.map(({name, job, address}) => (
-    <StructuredListRow label>
-      <StructuredListCell>{name}</StructuredListCell>
-      <StructuredListCell>{job}</StructuredListCell>
-      <StructuredListCell>{address}</StructuredListCell>
-    </StructuredListRow>   
-)));
-```
-
-8. We need to integrate the `StructuredList` components in the return section of `App.js` (the `<br />` tags are temporal, we will remove them when using the Carbon Grid):
-```jsx
-<div className="App">
-      <Header aria-label="IBM Platform Name">
-        <HeaderName href="#" prefix="CRUD">
-          Sample Application
-        </HeaderName>
-      </Header>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      { people.length > 0 && (
+<>
+  <Header aria-label="IBM Platform Name">
+    <HeaderName prefix="CRUD">Sample Application</HeaderName>
+  </Header>
+  <div className="bx--grid bx--grid--full-width app__grid">
+    <div className="bx--row">
+      <div className="bx--offset-lg-2 bx--col-lg-12">
         <StructuredListWrapper>
           <StructuredListHead>
             <StructuredListRow head>
               <StructuredListCell head>Name</StructuredListCell>
               <StructuredListCell head>Job</StructuredListCell>
               <StructuredListCell head>Address</StructuredListCell>
+              <StructuredListCell head>Has Kids</StructuredListCell>
             </StructuredListRow>
           </StructuredListHead>
           <StructuredListBody>
-            {getPersonData()}
+            {people.length > 0 && getPersonData()}
           </StructuredListBody>
         </StructuredListWrapper>
-      )}
-      <br />
-      <br />
-      <br />
-      <Button onClick={onFetch}>
-        Fetch
-      </Button>
+      </div>
+      <div className="bx--offset-lg-2" />
     </div>
+  </div>
+</>
 ```
 
-9. The `App.js` file should look like this after all these changes we made:
+7. In order to fetch the Person data we need to import the `useEffect` function in `App.js` and add into our file:
+
 ```jsx
-import { useState } from 'react';
-import { 
-  Header, 
-  HeaderName, 
-  Button,
-  StructuredListWrapper,
-  StructuredListHead,
-  StructuredListBody,
-  StructuredListRow,
-  StructuredListCell,
- } from 'carbon-components-react';
-import PersonService from './services/PersonService';
-import './App.css';
+useEffect(() => {
+  onFetch();
+}, []);
+```
 
-function App() {
+8. Then import the `StructuredListSkeleton` component from Carbon and use it in the JSX like this:
 
-  const [people, setPeople] = useState([]);
-
-  const onFetch = () => {
-    PersonService.getAll()
-    .then(response => {
-      setPeople(response.data);
-    })
-    .catch(e => {
-      console.log("Something wrong happened");
-    });
-  };
-
-  const getPersonData = () => (people.map(({name, job, address}) => (
-    <StructuredListRow label>
-      <StructuredListCell>{name}</StructuredListCell>
-      <StructuredListCell>{job}</StructuredListCell>
-      <StructuredListCell>{address}</StructuredListCell>
-    </StructuredListRow>   
-  )));
-
-  return (
-    <div className="App">
-      <Header aria-label="IBM Platform Name">
-        <HeaderName href="#" prefix="CRUD">
-          Sample Application
-        </HeaderName>
-      </Header>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      { people.length > 0 && (
-        <StructuredListWrapper>
-          <StructuredListHead>
-            <StructuredListRow head>
-              <StructuredListCell head>Name</StructuredListCell>
-              <StructuredListCell head>Job</StructuredListCell>
-              <StructuredListCell head>Address</StructuredListCell>
-            </StructuredListRow>
-          </StructuredListHead>
-          <StructuredListBody>
-            {getPersonData()}
-          </StructuredListBody>
-        </StructuredListWrapper>
-      )}
-      <br />
-      <br />
-      <br />
-      <Button onClick={onFetch}>
-        Fetch
-      </Button>
+```jsx
+<>
+  <Header aria-label="IBM Platform Name">
+    <HeaderName prefix="CRUD">Sample Application</HeaderName>
+  </Header>
+  <div className="bx--grid bx--grid--full-width app__grid">
+    <div className="bx--row">
+      <div className="bx--offset-lg-2 bx--col-lg-12">
+        {people.length > 0 ? (
+          <StructuredListWrapper>
+            <StructuredListHead>
+              <StructuredListRow head>
+                <StructuredListCell head>Name</StructuredListCell>
+                <StructuredListCell head>Job</StructuredListCell>
+                <StructuredListCell head>Address</StructuredListCell>
+                <StructuredListCell head>Has Kids</StructuredListCell>
+              </StructuredListRow>
+            </StructuredListHead>
+            <StructuredListBody>{getPersonData()}</StructuredListBody>
+          </StructuredListWrapper>
+        ) : (
+          <StructuredListSkeleton />
+        )}
+      </div>
+      <div className="bx--offset-lg-2" />
     </div>
-  );
+  </div>
+</>
+```
+
+9. Add these new styles in `App.scss` file:
+
+```scss
+.app__person-row {
+  padding-top: $spacing-05 * 3;
 }
 
-export default App;
+.app__new-btn {
+  margin-right: $spacing-01;
+}
+```
+
+10. Add the following set of buttons before the row that contains the `StructuredList` component:
+
+```jsx
+<div className="bx--row">
+  <div className="bx--offset-lg-12 bx--col-lg-3">
+    <Button className="app__new-btn">Add new entry</Button>
+    <Button>Refresh</Button>
+  </div>
+  <div className="bx--offset-lg-1" />
+</div>
+```
+
+11. Create a `components` directory under `src`.
+
+12. Then create a file called `PersonList.jsx` and create a component that only contains all related code that renders the person data in the UI.
+
+13. Import `PersonList.jsx` in `App.js` in order to use it.
+
+14. After all these changes your `App.js` file should look like this:
+
+```jsx
 
 ```
