@@ -1,0 +1,14 @@
+@import 'carbon-components/scss/globals/scss/vendor/@carbon/layout/scss/breakpoint.scss';
+@import 'carbon-components/scss/globals/scss/vars.scss';
+
+.app__grid {
+	padding-top: $spacing-05 * 7;
+}
+
+.app__person-row {
+	padding-top: $spacing-05 * 3;
+}
+
+.app__new-btn {
+	margin-right: $spacing-01;
+}

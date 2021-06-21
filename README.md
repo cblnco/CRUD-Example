@@ -138,15 +138,3 @@ useEffect(() => {
   <div className="bx--offset-lg-1" />
 </div>
 ```
-
-11. Create a `components` directory under `src`.
-
-12. Then create a file called `PersonList.jsx` and create a component that only contains all related code that renders the person data in the UI.
-
-13. Import `PersonList.jsx` in `App.js` in order to use it.
-
-14. After all these changes your `App.js` file should look like this:
-
-```jsx
-
-```
