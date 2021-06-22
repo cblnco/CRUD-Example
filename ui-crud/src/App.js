@@ -1,16 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-	Header,
-	HeaderName,
-	Button,
-	StructuredListWrapper,
-	StructuredListHead,
-	StructuredListBody,
-	StructuredListRow,
-	StructuredListCell,
-	StructuredListSkeleton,
-} from 'carbon-components-react';
+import { Button } from 'carbon-components-react';
+import HeaderCRUD from './components/Header';
 import PersonList from './components/PersonList';
+import CreateModal from './components/CreateModal';
 import PersonService from './services/PersonService';
 import './App.scss';
 
@@ -20,6 +12,7 @@ function App() {
 	}, []);
 
 	const [people, setPeople] = useState([]);
+	const [isCreateOpen, setIsCreateOpen] = useState(false);
 
 	const onFetch = () => {
 		PersonService.getAll()
@@ -31,50 +24,27 @@ function App() {
 			});
 	};
 
-	const getPersonData = () =>
-		people.map(({ name, job, address, hasKids }) => (
-			<StructuredListRow label>
-				<StructuredListCell>{name}</StructuredListCell>
-				<StructuredListCell>{job}</StructuredListCell>
-				<StructuredListCell>{address}</StructuredListCell>
-				<StructuredListCell>{hasKids.toString()}</StructuredListCell>
-			</StructuredListRow>
-		));
-
 	return (
 		<>
-  <Header aria-label="IBM Platform Name">
-    <HeaderName prefix="CRUD">Sample Application</HeaderName>
-  </Header>
+  <HeaderCRUD ariaLabel="IBM Crud Example" prefix="CRUD">
+		Sample Application
+	</HeaderCRUD>
   <div className="bx--grid bx--grid--full-width app__grid">
 	<div className="bx--row">
   <div className="bx--offset-lg-12 bx--col-lg-3">
-    <Button className="app__new-btn">Add new entry</Button>
+    <Button className="app__new-btn" onClick={() => setIsCreateOpen(true)}>Add new entry</Button>
     <Button>Refresh</Button>
   </div>
   <div className="bx--offset-lg-1" />
 </div>
     <div className="bx--row app__person-row">
       <div className="bx--offset-lg-2 bx--col-lg-12">
-        {people.length > 0 ? (
-          <StructuredListWrapper>
-            <StructuredListHead>
-              <StructuredListRow head>
-                <StructuredListCell head>Name</StructuredListCell>
-                <StructuredListCell head>Job</StructuredListCell>
-                <StructuredListCell head>Address</StructuredListCell>
-                <StructuredListCell head>Has Kids</StructuredListCell>
-              </StructuredListRow>
-            </StructuredListHead>
-            <StructuredListBody>{getPersonData()}</StructuredListBody>
-          </StructuredListWrapper>
-        ) : (
-          <StructuredListSkeleton />
-        )}
+				<PersonList headers={["Name", "Job", "Address", "Has Kids"]} people={people} />
       </div>
       <div className="bx--offset-lg-2" />
     </div>
   </div>
+	<CreateModal isCreateOpen={isCreateOpen} setIsCreateOpen={setIsCreateOpen} />
 </>
 	);
 }
