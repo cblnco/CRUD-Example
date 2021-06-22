@@ -199,4 +199,4 @@ function App() {
 export default App;
 ```
 
-7. The refactor of `App.js` was successfull and now we have a modal that will allow us to add more entries on our DB eventually.
+7. With this we completed the refactor of `App.js`, also now we have a modal that will allow us to add more entries on our DB eventually.
