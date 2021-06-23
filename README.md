@@ -1,202 +1,334 @@
-# Session 9: Creating React components.
+# Session 10: Creating new entries in our API.
+
 ## Steps for this session:
 
-1. Create a `components` directory inside of `src`:
-
-2. Add a `HeaderCRUD` folder inside of `components` and create an `index.jsx` file with this content:
+1. First we need to include the `phone` value our `PersonList` component, so we can display all the registered values:
 
 ```jsx
-import React from 'react';
-import { Header, HeaderName } from 'carbon-components-react';
-
-const HeaderCRUD = (prop) => {
-  const { ariaLabel, prefix, children } = prop;
-  return (
-    <Header aria-label={ariaLabel}>
-    <HeaderName prefix={prefix}>{children}</HeaderName>
-  </Header>
-  );
-};
-
-export default HeaderCRUD;
-```
-
-3. Now create a `PersonList/index.jsx` under `components` with the following code:
-
-```jsx
-import React from 'react';
-import { 
-	StructuredListWrapper,
-	StructuredListHead,
-	StructuredListBody,
-	StructuredListRow,
-	StructuredListCell,
-	StructuredListSkeleton, 
-} from 'carbon-components-react';
-
-const PersonList = ({ people, headers }) => {
-
-	let listHeader = [];
-	let personData = [];
-	let hasPeople = people.length > 0;
-	
-	const getListHeaders = () => headers.map(
-		(headerName) => <StructuredListCell head>{headerName}</StructuredListCell>
-	);
-
-	const getPersonData = () =>
-		people.map(({ name, job, address, hasKids }) => (
-			<StructuredListRow label>
-				<StructuredListCell>{name}</StructuredListCell>
-				<StructuredListCell>{job}</StructuredListCell>
-				<StructuredListCell>{address}</StructuredListCell>
-				<StructuredListCell>{hasKids.toString()}</StructuredListCell>
-			</StructuredListRow>
+const getPersonData = () =>
+	people.map(({ name, job, address, phone, hasKids }) => (
+		<StructuredListRow label>
+			<StructuredListCell>{name}</StructuredListCell>
+			<StructuredListCell>{job}</StructuredListCell>
+			<StructuredListCell>{address}</StructuredListCell>
+			<StructuredListCell>{phone}</StructuredListCell>
+			<StructuredListCell>{hasKids.toString()}</StructuredListCell>
+		</StructuredListRow>
 	));
-
-	listHeader = getListHeaders();
-	personData = getPersonData();
-
-	return (
-		<>
-		{hasPeople ? (
-			<StructuredListWrapper>
-				<StructuredListHead>
-					<StructuredListRow head>
-						{listHeader}
-					</StructuredListRow>
-				</StructuredListHead>
-				<StructuredListBody>
-					{personData}
-				</StructuredListBody>
-			</StructuredListWrapper>
-		) : (
-			<StructuredListSkeleton />
-		)}
-		</>
-	);
-};
-
-export default PersonList;
 ```
 
-4. Add a `CreateModal/index.jsx` structure and add the following content to it:
+2. Make sure to include the `Phone` header in the props of `PersonList` that is used in `App.js`:
 
 ```jsx
-import React from 'react';
-import { ComposedModal, ModalHeader, ModalBody, TextInput } from 'carbon-components-react';
+<div className='bx--row app__person-row'>
+	<div className='bx--offset-lg-2 bx--col-lg-12'>
+		<PersonList
+			headers={['Name', 'Job', 'Address', 'Phone', 'Has Kids']}
+			people={people}
+		/>
+	</div>
+	<div className='bx--offset-lg-2' />
+</div>
+```
+
+3. Add a `CreateModal.scss` file under `/src/components/CreateModal` with the following content:
+
+```scss
+@import 'carbon-components/scss/globals/scss/vendor/@carbon/layout/scss/breakpoint.scss';
+@import 'carbon-components/scss/globals/scss/vars.scss';
+
+.create-modal__row {
+	margin-bottom: $spacing-05 + $spacing-01;
+}
+```
+
+3. Then we need to modify our `CreateModal` component and import the `ModalFooter` and `Checkbox` components:
+
+```jsx
+import {
+	ComposedModal,
+	ModalHeader,
+	ModalBody,
+	ModalFooter,
+	TextInput,
+	Checkbox,
+} from 'carbon-components-react';
+```
+
+4. Also import the `PersonService` object so we can communicate with the Mongo API:
+
+```jsx
+import PersonService from '../../services/PersonService';
+```
+
+5. Import `useState` from React and add the following variables and event functions:
+
+```jsx
+import { useState } from 'react';
+.
+.
+.
+const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
+	const [personData, setPersonData] = useState({
+		name: '',
+		job: '',
+		address: '',
+		phone: 21111,
+		hasKids: false,
+	});
+
+	const onBlur = (event) => {
+		const inputName = event.target.name;
+		const value = event.target.value;
+		const newPerson = { ...personData };
+		newPerson[inputName] = value;
+		setPersonData(newPerson);
+	};
+
+	const onClose = () => {
+		setPersonData({
+			name: '',
+			job: '',
+			address: '',
+			phone: 21111,
+			hasKids: false,
+		});
+		setIsCreateOpen(false);
+	};
+
+	const onSubmit = () => {
+		PersonService.create(personData)
+			.then(() => console.log('The new person was created'))
+			.catch((e) => console.log('An error happened while registering a new person', e));
+
+		onClose();
+	};
+
+	.
+	.
+	.
+};
+```
+
+6. Now we need to integrate all the components, event functions and data ito our modal body:
+
+```jsx
+<ComposedModal open={isCreateOpen} onClose={onClose}>
+	<ModalHeader title='Add a new person.' />
+	<ModalBody hasForm>
+		<div className='bx--grid bx--grid--full-width'>
+			<div className='bx--row create-modal__row'>
+				<div className='bx--col-lg-8'>
+					<TextInput
+						id='person-name'
+						name='name'
+						data-modal-primary-focus
+						labelText='Name'
+						placeholder='Jhon Smith'
+						onBlur={onBlur}
+					/>
+				</div>
+				<div className='bx--offset-lg-8' />
+			</div>
+			<div className='bx--row create-modal__row'>
+				<div className='bx--col-lg-6'>
+					<TextInput
+						id='person-job'
+						name='job'
+						data-modal-primary-focus
+						labelText='Job'
+						placeholder='Lawyer'
+						onBlur={onBlur}
+					/>
+				</div>
+				<div className='bx--offset-lg-10' />
+			</div>
+			<div className='bx--row create-modal__row'>
+				<div className='bx--col-lg-9'>
+					<TextInput
+						id='person-address'
+						name='address'
+						data-modal-primary-focus
+						labelText='Address'
+						placeholder='Great st. #1124'
+						onBlur={onBlur}
+					/>
+				</div>
+				<div className='bx--offset-lg-7' />
+			</div>
+			<div className='bx--row create-modal__row'>
+				<div className='bx--col-lg-4'>
+					<TextInput
+						id='person-phone'
+						type='number'
+						name='phone'
+						data-modal-primary-focus
+						labelText='Phone'
+						placeholder='8834000'
+						onBlur={onBlur}
+					/>
+				</div>
+				<div className='bx--offset-lg-12' />
+			</div>
+			<div className='bx--row create-modal__row'>
+				<div className='bx--col-lg-3'>
+					<Checkbox
+						id='person-haskids'
+						name='hasKids'
+						labelText='Has kids'
+						checked={personData.hasKids}
+						onBlur={onBlur}
+					/>
+				</div>
+				<div className='bx--offset-lg-12' />
+			</div>
+		</div>
+	</ModalBody>
+	<ModalFooter
+		primaryButtonText='Add'
+		secondaryButtonText='Cancel'
+		onRequestClose={onClose}
+		onRequestSubmit={onSubmit}
+	/>
+</ComposedModal>
+```
+
+7. At the end, our `CreateModal` component should look like this:
+
+```jsx
+import { useState } from 'react';
+import {
+	ComposedModal,
+	ModalHeader,
+	ModalBody,
+	ModalFooter,
+	TextInput,
+	Checkbox,
+} from 'carbon-components-react';
+import PersonService from '../../services/PersonService';
+import './CreateModal.scss';
 
 const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
-  return (
-    <ComposedModal open={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
-      <ModalHeader />
-        <ModalBody hasForm>
-          <TextInput data-modal-primary-focus labelText="Enter something" />
-          <p className="bx--modal-content__text bx--modal-content__regular-content">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            cursus fermentum risus, sit amet fringilla nunc pellentesque quis. Duis
-            quis odio ultrices, cursus lacus ac, posuere felis. Donec dignissim libero
-            in augue mattis, a molestie metus vestibulum. Aliquam placerat felis
-            ultrices lorem condimentum, nec ullamcorper felis porttitor.
-          </p>
-      </ModalBody>
-</ComposedModal>
-  );
+	const [personData, setPersonData] = useState({
+		name: '',
+		job: '',
+		address: '',
+		phone: 21111,
+		hasKids: false,
+	});
+
+	const onBlur = (event) => {
+		const inputName = event.target.name;
+		const value = event.target.value;
+		const newPerson = { ...personData };
+		newPerson[inputName] = value;
+		setPersonData(newPerson);
+	};
+
+	const onClose = () => {
+		setPersonData({
+			name: '',
+			job: '',
+			address: '',
+			phone: 21111,
+			hasKids: false,
+		});
+		setIsCreateOpen(false);
+	};
+
+	const onSubmit = () => {
+		PersonService.create(personData)
+			.then(() => console.log('The new person was created'))
+			.catch((e) => console.log('An error happened while registering a new person', e));
+
+		onClose();
+	};
+
+	return (
+		<ComposedModal open={isCreateOpen} onClose={onClose}>
+			<ModalHeader title='Add a new person.' />
+			<ModalBody hasForm>
+				<div className='bx--grid bx--grid--full-width'>
+					<div className='bx--row create-modal__row'>
+						<div className='bx--col-lg-8'>
+							<TextInput
+								id='person-name'
+								name='name'
+								data-modal-primary-focus
+								labelText='Name'
+								placeholder='Jhon Smith'
+								onBlur={onBlur}
+							/>
+						</div>
+						<div className='bx--offset-lg-8' />
+					</div>
+					<div className='bx--row create-modal__row'>
+						<div className='bx--col-lg-6'>
+							<TextInput
+								id='person-job'
+								name='job'
+								data-modal-primary-focus
+								labelText='Job'
+								placeholder='Lawyer'
+								onBlur={onBlur}
+							/>
+						</div>
+						<div className='bx--offset-lg-10' />
+					</div>
+					<div className='bx--row create-modal__row'>
+						<div className='bx--col-lg-9'>
+							<TextInput
+								id='person-address'
+								name='address'
+								data-modal-primary-focus
+								labelText='Address'
+								placeholder='Great st. #1124'
+								onBlur={onBlur}
+							/>
+						</div>
+						<div className='bx--offset-lg-7' />
+					</div>
+					<div className='bx--row create-modal__row'>
+						<div className='bx--col-lg-4'>
+							<TextInput
+								id='person-phone'
+								type='number'
+								name='phone'
+								data-modal-primary-focus
+								labelText='Phone'
+								placeholder='8834000'
+								onBlur={onBlur}
+							/>
+						</div>
+						<div className='bx--offset-lg-12' />
+					</div>
+					<div className='bx--row create-modal__row'>
+						<div className='bx--col-lg-3'>
+							<Checkbox
+								id='person-haskids'
+								name='hasKids'
+								labelText='Has kids'
+								checked={personData.hasKids}
+								onBlur={onBlur}
+							/>
+						</div>
+						<div className='bx--offset-lg-12' />
+					</div>
+				</div>
+			</ModalBody>
+			<ModalFooter
+				primaryButtonText='Add'
+				secondaryButtonText='Cancel'
+				onRequestClose={onClose}
+				onRequestSubmit={onSubmit}
+			/>
+		</ComposedModal>
+	);
 };
 
 export default CreateModal;
 ```
 
-5. Finally we can import all these components in the `App.js` file like so:
+8. Now we can add new entries into our API.
 
-```jsx
-import HeaderCRUD from './components/Header';
-import PersonList from './components/PersonList';
-import CreateModal from './components/CreateModal';
-.
-.
-.
-
-return (
-		<>
-  <HeaderCRUD ariaLabel="IBM Crud Example" prefix="CRUD">
-		Sample Application
-	</HeaderCRUD>
-  <div className="bx--grid bx--grid--full-width app__grid">
-	<div className="bx--row">
-  <div className="bx--offset-lg-12 bx--col-lg-3">
-    <Button className="app__new-btn" onClick={() => setIsCreateOpen(true)}>Add new entry</Button>
-    <Button>Refresh</Button>
-  </div>
-  <div className="bx--offset-lg-1" />
-</div>
-    <div className="bx--row app__person-row">
-      <div className="bx--offset-lg-2 bx--col-lg-12">
-				<PersonList headers={["Name", "Job", "Address", "Has Kids"]} people={people} />
-      </div>
-      <div className="bx--offset-lg-2" />
-    </div>
-  </div>
-	<CreateModal isCreateOpen={isCreateOpen} setIsCreateOpen={setIsCreateOpen} />
-</>
-	);
-```
-
-6. After these changes, we added the new `isCreateOpen` and `setIsCreateOpen` objects with `useState`. Now the `App.js` file should look like this:
-
-```jsx
-import { useState, useEffect } from 'react';
-import { Button } from 'carbon-components-react';
-import HeaderCRUD from './components/Header';
-import PersonList from './components/PersonList';
-import CreateModal from './components/CreateModal';
-import PersonService from './services/PersonService';
-import './App.scss';
-
-function App() {
-	useEffect(() => {
-		onFetch();
-	}, []);
-
-	const [people, setPeople] = useState([]);
-	const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-	const onFetch = () => {
-		PersonService.getAll()
-			.then((response) => {
-				setPeople(response.data);
-			})
-			.catch((e) => {
-				console.log('Something wrong happened');
-			});
-	};
-
-	return (
-		<>
-  <HeaderCRUD ariaLabel="IBM Crud Example" prefix="CRUD">
-		Sample Application
-	</HeaderCRUD>
-  <div className="bx--grid bx--grid--full-width app__grid">
-	<div className="bx--row">
-  <div className="bx--offset-lg-12 bx--col-lg-3">
-    <Button className="app__new-btn" onClick={() => setIsCreateOpen(true)}>Add new entry</Button>
-    <Button>Refresh</Button>
-  </div>
-  <div className="bx--offset-lg-1" />
-</div>
-    <div className="bx--row app__person-row">
-      <div className="bx--offset-lg-2 bx--col-lg-12">
-				<PersonList headers={["Name", "Job", "Address", "Has Kids"]} people={people} />
-      </div>
-      <div className="bx--offset-lg-2" />
-    </div>
-  </div>
-	<CreateModal isCreateOpen={isCreateOpen} setIsCreateOpen={setIsCreateOpen} />
-</>
-	);
-}
-
-export default App;
-```
-
-7. With this we completed the refactor of `App.js`, also now we have a modal that will allow us to add more entries on our DB eventually.
+**Note:** _You can check all the files in this branch to see all the code changes we have made._
