@@ -49,7 +49,11 @@ function App() {
 					<div className='bx--offset-lg-2' />
 				</div>
 			</div>
-			<CreateModal isCreateOpen={isCreateOpen} setIsCreateOpen={setIsCreateOpen} />
+			<CreateModal
+				isCreateOpen={isCreateOpen}
+				setIsCreateOpen={setIsCreateOpen}
+				refresh={onFetch}
+			/>
 		</>
 	);
 }

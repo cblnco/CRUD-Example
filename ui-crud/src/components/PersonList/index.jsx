@@ -26,6 +26,7 @@ const PersonList = ({ people, headers }) => {
 				<StructuredListCell>{address}</StructuredListCell>
 				<StructuredListCell>{phone}</StructuredListCell>
 				<StructuredListCell>{hasKids.toString()}</StructuredListCell>
+				<StructuredListCell>Update | Delete</StructuredListCell>
 			</StructuredListRow>
 		));
 

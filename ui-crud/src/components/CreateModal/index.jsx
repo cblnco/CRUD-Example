@@ -10,16 +10,19 @@ import {
 import PersonService from '../../services/PersonService';
 import './CreateModal.scss';
 
-const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
-	const [personData, setPersonData] = useState({
+const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
+	const personInitialData = {
 		name: '',
 		job: '',
 		address: '',
-		phone: 21111,
+		phone: '',
 		hasKids: false,
-	});
+	};
 
-	const onBlur = (event) => {
+	const [isNameInvalid, setIsNameInvalid] = useState(false);
+	const [personData, setPersonData] = useState(personInitialData);
+
+	const onChange = (event) => {
 		const inputName = event.target.name;
 		const value = event.target.value;
 		const newPerson = { ...personData };
@@ -27,24 +30,46 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
 		setPersonData(newPerson);
 	};
 
+	const onHasKidsChange = ({ value }) => {
+		const newPerson = { ...personData };
+		newPerson.hasKids = value;
+		setPersonData(newPerson);
+	};
+
+	const onNameBlur = (event) => {
+		const value = event.target.value;
+		setIsNameInvalid(!value || value.length < 5);
+	};
+
+	const onPhoneBlur = () => {
+		const newPhone = personData.phone;
+		const newPerson = { ...personData };
+		newPerson.phone = newPhone.replace(/\D/, '');
+		setPersonData(newPerson);
+	};
+
 	const onClose = () => {
-		setPersonData({
-			name: '',
-			job: '',
-			address: '',
-			phone: 21111,
-			hasKids: false,
-		});
+		// Clean person data.
+		setPersonData(personInitialData);
 		setIsCreateOpen(false);
 	};
 
 	const onSubmit = () => {
-		PersonService.create(personData)
-			.then(() => console.log('The new person was created'))
-			.catch((e) => console.log('An error happened while registering a new person', e));
+		if (!isNameInvalid) {
+			PersonService.create(personData)
+				.then(() => {
+					console.log('The new person was created');
+					refresh();
+				})
+				.catch((e) =>
+					console.log('An error happened while registering a new person.', e)
+				);
+		}
 
 		onClose();
 	};
+
+	const { name, job, address, phone, hasKids } = personData;
 
 	return (
 		<ComposedModal open={isCreateOpen} onClose={onClose}>
@@ -59,7 +84,11 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
 								data-modal-primary-focus
 								labelText='Name'
 								placeholder='Jhon Smith'
-								onBlur={onBlur}
+								value={name}
+								invalid={isNameInvalid}
+								invalidText='Your name shouldnt be empty and should be loger than 5 characters.'
+								onBlur={onNameBlur}
+								onChange={onChange}
 							/>
 						</div>
 						<div className='bx--offset-lg-8' />
@@ -72,7 +101,8 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
 								data-modal-primary-focus
 								labelText='Job'
 								placeholder='Lawyer'
-								onBlur={onBlur}
+								value={job}
+								onChange={onChange}
 							/>
 						</div>
 						<div className='bx--offset-lg-10' />
@@ -85,7 +115,8 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
 								data-modal-primary-focus
 								labelText='Address'
 								placeholder='Great st. #1124'
-								onBlur={onBlur}
+								value={address}
+								onChange={onChange}
 							/>
 						</div>
 						<div className='bx--offset-lg-7' />
@@ -99,7 +130,8 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
 								data-modal-primary-focus
 								labelText='Phone'
 								placeholder='8834000'
-								onBlur={onBlur}
+								value={phone}
+								onChange={onChange}
 							/>
 						</div>
 						<div className='bx--offset-lg-12' />
@@ -109,9 +141,10 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen }) => {
 							<Checkbox
 								id='person-haskids'
 								name='hasKids'
-								labelText='Has kids'
-								checked={personData.hasKids}
-								onBlur={onBlur}
+								title='Family information'
+								labelText='Do you have kids?'
+								checked={hasKids}
+								onChange={onHasKidsChange}
 							/>
 						</div>
 						<div className='bx--offset-lg-12' />
