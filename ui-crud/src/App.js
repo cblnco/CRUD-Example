@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from 'carbon-components-react';
 import HeaderCRUD from './components/Header';
 import PersonList from './components/PersonList';
-import CreateModal from './components/CreateModal';
+import CrudModal from './components/CrudModal';
 import PersonService from './services/PersonService';
 import './App.scss';
 
@@ -12,7 +12,9 @@ function App() {
 	}, []);
 
 	const [people, setPeople] = useState([]);
+	const [selectedPerson, setSelectedPerson] = useState({});
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
+	const [isEditOpen, setIsEditOpen] = useState(false);
 
 	const onFetch = () => {
 		PersonService.getAll()
@@ -44,14 +46,28 @@ function App() {
 						<PersonList
 							headers={['Name', 'Job', 'Address', 'Phone', 'Has Kids']}
 							people={people}
+							setIsEditOpen={setIsEditOpen}
+							setSelectedPerson={setSelectedPerson}
 						/>
 					</div>
 					<div className='bx--offset-lg-2' />
 				</div>
 			</div>
-			<CreateModal
-				isCreateOpen={isCreateOpen}
-				setIsCreateOpen={setIsCreateOpen}
+			<CrudModal
+				title='Add a new person'
+				type='create'
+				primaryBtnText='Add'
+				isOpen={isCreateOpen}
+				setIsOpen={setIsCreateOpen}
+				refresh={onFetch}
+			/>
+			<CrudModal
+				title='Update person data'
+				type='update'
+				selectedPerson={selectedPerson}
+				primaryBtnText='Update entry'
+				isOpen={isEditOpen}
+				setIsOpen={setIsEditOpen}
 				refresh={onFetch}
 			/>
 		</>

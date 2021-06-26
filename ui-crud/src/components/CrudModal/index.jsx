@@ -8,10 +8,18 @@ import {
 	Checkbox,
 } from 'carbon-components-react';
 import PersonService from '../../services/PersonService';
-import './CreateModal.scss';
+import './CrudModal.scss';
 
-const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
-	const personInitialData = {
+const CrudModal = ({
+	title,
+	type,
+	primaryBtnText,
+	isOpen,
+	setIsOpen,
+	selectedPerson,
+	refresh,
+}) => {
+	const personInitialData = selectedPerson || {
 		name: '',
 		job: '',
 		address: '',
@@ -20,6 +28,7 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 	};
 
 	const [isNameInvalid, setIsNameInvalid] = useState(false);
+	const [isPhoneInvalid, setIsPhoneInvalid] = useState(false);
 	const [personData, setPersonData] = useState(personInitialData);
 
 	const onChange = (event) => {
@@ -41,42 +50,59 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 		setIsNameInvalid(!value || value.length < 5);
 	};
 
-	const onPhoneBlur = () => {
-		const newPhone = personData.phone;
-		const newPerson = { ...personData };
-		newPerson.phone = newPhone.replace(/\D/, '');
-		setPersonData(newPerson);
+	const onPhoneBlur = (event) => {
+		const value = event.target.value;
+		setIsPhoneInvalid(!value);
 	};
 
 	const onClose = () => {
 		// Clean person data.
 		setPersonData(personInitialData);
-		setIsCreateOpen(false);
+		setIsNameInvalid(false);
+		setIsPhoneInvalid(false);
+		setIsOpen(false);
 	};
 
 	const onSubmit = () => {
-		if (!isNameInvalid) {
-			PersonService.create(personData)
-				.then(() => {
-					console.log('The new person was created');
-					refresh();
-				})
-				.catch((e) =>
-					console.log('An error happened while registering a new person.', e)
-				);
-		}
+		if (!isNameInvalid && !isPhoneInvalid) {
+			switch (type) {
+				case 'create':
+					PersonService.create(personData)
+						.then(() => {
+							console.log('The new person was created.');
+							refresh();
+						})
+						.catch((e) =>
+							console.log('An error happened while registering a new person.', e)
+						);
+					break;
 
-		onClose();
+				case 'update':
+					const { id, ...newPersonData } = personData;
+					PersonService.update(id, newPersonData)
+						.then(() => {
+							console.log('The new person was update.');
+							refresh();
+						})
+						.catch((e) => console.log('An error happened while updating the person.', e));
+					break;
+
+				default:
+					break;
+			}
+
+			onClose();
+		}
 	};
 
 	const { name, job, address, phone, hasKids } = personData;
 
 	return (
-		<ComposedModal open={isCreateOpen} onClose={onClose}>
-			<ModalHeader title='Add a new person.' />
+		<ComposedModal open={isOpen} onClose={onClose}>
+			<ModalHeader title={title} />
 			<ModalBody hasForm>
 				<div className='bx--grid bx--grid--full-width'>
-					<div className='bx--row create-modal__row'>
+					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-8'>
 							<TextInput
 								id='person-name'
@@ -93,7 +119,7 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 						</div>
 						<div className='bx--offset-lg-8' />
 					</div>
-					<div className='bx--row create-modal__row'>
+					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-6'>
 							<TextInput
 								id='person-job'
@@ -107,7 +133,7 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 						</div>
 						<div className='bx--offset-lg-10' />
 					</div>
-					<div className='bx--row create-modal__row'>
+					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-9'>
 							<TextInput
 								id='person-address'
@@ -121,7 +147,7 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 						</div>
 						<div className='bx--offset-lg-7' />
 					</div>
-					<div className='bx--row create-modal__row'>
+					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-4'>
 							<TextInput
 								id='person-phone'
@@ -131,12 +157,15 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 								labelText='Phone'
 								placeholder='8834000'
 								value={phone}
+								invalid={isPhoneInvalid}
+								invalidText='Please add numbers only.'
 								onChange={onChange}
+								onBlur={onPhoneBlur}
 							/>
 						</div>
 						<div className='bx--offset-lg-12' />
 					</div>
-					<div className='bx--row create-modal__row'>
+					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-3'>
 							<Checkbox
 								id='person-haskids'
@@ -152,7 +181,7 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 				</div>
 			</ModalBody>
 			<ModalFooter
-				primaryButtonText='Add'
+				primaryButtonText={primaryBtnText}
 				secondaryButtonText='Cancel'
 				onRequestClose={onClose}
 				onRequestSubmit={onSubmit}
@@ -161,4 +190,4 @@ const CreateModal = ({ isCreateOpen, setIsCreateOpen, refresh }) => {
 	);
 };
 
-export default CreateModal;
+export default CrudModal;

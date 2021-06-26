@@ -1,4 +1,3 @@
-import React from 'react';
 import {
 	StructuredListWrapper,
 	StructuredListHead,
@@ -6,12 +5,18 @@ import {
 	StructuredListRow,
 	StructuredListCell,
 	StructuredListSkeleton,
+	Button,
 } from 'carbon-components-react';
+import { Edit24 } from '@carbon/icons-react';
 
-const PersonList = ({ people, headers }) => {
+const PersonList = ({ people, headers, setSelectedPerson }) => {
 	let listHeader = [];
 	let personData = [];
 	let hasPeople = people.length > 0;
+
+	const onEditClick = (person) => {
+		setSelectedPerson(person);
+	};
 
 	const getListHeaders = () =>
 		headers.map((headerName) => (
@@ -19,14 +24,21 @@ const PersonList = ({ people, headers }) => {
 		));
 
 	const getPersonData = () =>
-		people.map(({ name, job, address, phone, hasKids }) => (
+		people.map(({ id, name, job, address, phone, hasKids }) => (
 			<StructuredListRow label>
 				<StructuredListCell>{name}</StructuredListCell>
 				<StructuredListCell>{job}</StructuredListCell>
 				<StructuredListCell>{address}</StructuredListCell>
 				<StructuredListCell>{phone}</StructuredListCell>
 				<StructuredListCell>{hasKids.toString()}</StructuredListCell>
-				<StructuredListCell>Update | Delete</StructuredListCell>
+				<StructuredListCell>
+					<Button
+						renderIcon={Edit24}
+						iconDescription='Edit person'
+						hasIconOnly
+						onClick={() => onEditClick({ id, name, job, address, phone, hasKids })}
+					/>
+				</StructuredListCell>
 			</StructuredListRow>
 		));
 
