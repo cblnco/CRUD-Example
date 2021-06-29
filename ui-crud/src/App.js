@@ -12,9 +12,17 @@ function App() {
 	}, []);
 
 	const [people, setPeople] = useState([]);
-	const [selectedPerson, setSelectedPerson] = useState({});
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
-	const [isEditOpen, setIsEditOpen] = useState(false);
+	const [editModalState, setEditModalState] = useState({
+		selectedPerson: {},
+		isEditOpen: false,
+	});
+
+	const setIsEditOpen = (flag) => {
+		const newEditModalState = { ...editModalState };
+		newEditModalState.isEditOpen = flag;
+		setEditModalState(newEditModalState);
+	};
 
 	const onFetch = () => {
 		PersonService.getAll()
@@ -25,6 +33,19 @@ function App() {
 				console.log('Something wrong happened');
 			});
 	};
+
+	const onDelete = (id) => {
+		PersonService.remove(id)
+			.then(() => {
+				console.log(`The person with the id: ${id} was deleted successfully.`);
+				onFetch();
+			})
+			.catch((e) => {
+				console.log('Something went wrong while deleting the person.');
+			});
+	};
+
+	const { selectedPerson, isEditOpen } = editModalState;
 
 	return (
 		<>
@@ -46,8 +67,8 @@ function App() {
 						<PersonList
 							headers={['Name', 'Job', 'Address', 'Phone', 'Has Kids']}
 							people={people}
-							setIsEditOpen={setIsEditOpen}
-							setSelectedPerson={setSelectedPerson}
+							setEditModalState={setEditModalState}
+							onDelete={onDelete}
 						/>
 					</div>
 					<div className='bx--offset-lg-2' />
@@ -61,15 +82,17 @@ function App() {
 				setIsOpen={setIsCreateOpen}
 				refresh={onFetch}
 			/>
-			<CrudModal
-				title='Update person data'
-				type='update'
-				selectedPerson={selectedPerson}
-				primaryBtnText='Update entry'
-				isOpen={isEditOpen}
-				setIsOpen={setIsEditOpen}
-				refresh={onFetch}
-			/>
+			{isEditOpen && (
+				<CrudModal
+					title='Update person data'
+					type='update'
+					selectedPerson={selectedPerson}
+					primaryBtnText='Update entry'
+					isOpen={isEditOpen}
+					setIsOpen={setIsEditOpen}
+					refresh={onFetch}
+				/>
+			)}
 		</>
 	);
 }

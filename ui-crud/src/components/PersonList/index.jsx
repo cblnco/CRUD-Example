@@ -7,15 +7,19 @@ import {
 	StructuredListSkeleton,
 	Button,
 } from 'carbon-components-react';
-import { Edit24 } from '@carbon/icons-react';
+import { Edit24, SubtractAlt24 } from '@carbon/icons-react';
+import './PersonList.scss';
 
-const PersonList = ({ people, headers, setSelectedPerson }) => {
+const PersonList = ({ people, headers, setEditModalState, onDelete }) => {
 	let listHeader = [];
 	let personData = [];
 	let hasPeople = people.length > 0;
 
 	const onEditClick = (person) => {
-		setSelectedPerson(person);
+		setEditModalState({
+			selectedPerson: person,
+			isEditOpen: true,
+		});
 	};
 
 	const getListHeaders = () =>
@@ -36,7 +40,17 @@ const PersonList = ({ people, headers, setSelectedPerson }) => {
 						renderIcon={Edit24}
 						iconDescription='Edit person'
 						hasIconOnly
+						kind='ghost'
 						onClick={() => onEditClick({ id, name, job, address, phone, hasKids })}
+					/>
+					&nbsp;
+					<Button
+						className='subtract-icon'
+						renderIcon={SubtractAlt24}
+						iconDescription='Delete person'
+						hasIconOnly
+						kind='danger--ghost'
+						onClick={() => onDelete(id)}
 					/>
 				</StructuredListCell>
 			</StructuredListRow>
