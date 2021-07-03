@@ -1,0 +1,27 @@
+{
+  "name": "testing-crud",
+  "version": "1.0.0",
+  "description": "Testing CRUD-example with Cypress.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cblnco/CRUD-Example.git"
+  },
+  "keywords": [
+    "testing",
+    "cypress",
+    "javascript"
+  ],
+  "author": "jcarlos.kb@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cblnco/CRUD-Example/issues"
+  },
+  "homepage": "https://github.com/cblnco/CRUD-Example#readme",
+  "dependencies": {
+    "cypress": "^7.6.0"
+  }
+}
