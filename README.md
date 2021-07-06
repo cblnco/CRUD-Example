@@ -12,13 +12,13 @@
 let peopleArray;
 
 before(() => {
-  // Get fixture data.
-  cy.fixture('people').then(people => (peopleArray = people));
+	// Get fixture data.
+	cy.fixture('people').then((people) => (peopleArray = people));
 });
 
 beforeEach(() => {
-  // Visit the CRUD-Sample application in each test case.
-  cy.visit('localhost:3000');
+	// Visit the CRUD-Sample application in each test case.
+	cy.visit('localhost:3000');
 });
 ```
 
@@ -26,20 +26,20 @@ beforeEach(() => {
 
 ```json
 [
-  {
-    "name": "Cypress test person",
-    "job": "Software tester",
-    "address": "Cypress av.",
-    "phone": 23840823,
-    "hasKids": false
-  },
-  {
-    "name": "Cypress Devops Person",
-    "job": "Devops Engineer",
-    "address": "CY st.",
-    "phone": 33982138,
-    "hasKids": false
-  }
+	{
+		"name": "Cypress test person",
+		"job": "Software tester",
+		"address": "Cypress av.",
+		"phone": 23840823,
+		"hasKids": false
+	},
+	{
+		"name": "Cypress Devops Person",
+		"job": "Devops Engineer",
+		"address": "CY st.",
+		"phone": 33982138,
+		"hasKids": false
+	}
 ]
 ```
 
@@ -47,17 +47,17 @@ beforeEach(() => {
 
 ```js
 it('Creates a single new person and deletes it.', () => {
-  const {name, job, address, phone, hasKids} = peopleArray[0];
-  cy.get('#add-new-entry').click();
+	const { name, job, address, phone, hasKids } = peopleArray[0];
+	cy.get('#add-new-entry').click();
 
-  cy.get('#person-name').type(name);
-  cy.get('#person-job').type(job);
-  cy.get('#person-address').type(address);
-  cy.get('#person-phone').type(phone);
+	cy.get('#person-name').type(name);
+	cy.get('#person-job').type(job);
+	cy.get('#person-address').type(address);
+	cy.get('#person-phone').type(phone);
 
-  if (hasKids) {
-    cy.get('.bx--checkbox-label').click();
-  }
+	if (hasKids) {
+		cy.get('.bx--checkbox-label').click();
+	}
 });
 ```
 
@@ -83,82 +83,37 @@ cy.get('.app__person-row')
       .click();
 ```
 
-7. Now we are going to select the `Add new entry` button with this Cypress sentence:
+7. Now we will use the previous commands to add multiple entries in the CRUD application and assert if they exist and delete them:
 
 ```js
-cy.get(`#add-new-entry`);
-```
+describe('First test case group', () => {
+	it('Add people test case', () => {
+		peopleArray.forEach(({ name, job, address, phone, hasKids }) => {
+			cy.get('#add-new-entry').click();
 
-8. We can also get the same button in different ways:
+			cy.get('#person-name').type(name);
+			cy.get('#person-job').type(job);
+			cy.get('#person-address').type(address);
+			cy.get('#person-phone').type(phone);
 
-```js
-cy.get('.app__new-btn');
+			if (hasKids) {
+				cy.get('.bx--checkbox-label').click();
+			}
 
-cy.get('#main-btn-container button:nth-child(1)');
-```
+			cy.get('.bx--modal-footer > .bx--btn--primary').click();
+			cy.get('.app__person-row').contains(name).should('exist');
+		});
+	});
 
-9. Add the `.click()` function to the `cy.get('#main-btn-container button:nth-child(1)')` sentence and verify if the `Add a new person` modal is visible:
-
-```js
-// Interacting with the 'Add new entry' button and clicking it.
-cy.get('#main-btn-container button:nth-child(1)').click();
-
-// Then we verify if the 'Add a new person' modal header is visible.
-cy.get('.bx--modal-header__heading').should('be.visible');
-```
-
-10. Then we click the `Cancel` button an verify that it's not visible to confirm that the overlay is closed:
-
-```js
-// Click the modal's cancel button.
-cy.get('.bx--btn--secondary').click();
-
-// Confirm that the modal has been closed.
-cy.get('.bx--modal-header__heading').should('not.be.visible');
-```
-
-11. Now we are going to create another scenario to test the `/api/person` calls in the UI:
-
-```js
-it('Verify GET /api/person calls in CRUD-Sample application.', () => {
-  // Intercept will help us to spy on every GET request made to /api/person.
-  cy.intercept({
-    method: 'GET',
-    url: '/api/person',
-  }).as('refreshCheck');
-
-  cy.visit('localhost:3000');
+	after(() => {
+		peopleArray.forEach(({ name }) => {
+			cy.get('.app__person-row').contains(name).find('button:nth-child(2)').click();
+			cy.get('.app__person-row').contains(name).should('not.exist');
+		});
+	});
 });
 ```
 
-12. Since the CRUD-Sample application gets all the database entries at the begining, we will wait for that API request and verify if it's status is equal to `304`:
-
-```js
-// Wait for the /api/person GET request with the alias that we wrote previously.
-cy.wait('@refreshCheck').should(({response}) => {
-  // Verify that the response object is defined.
-  assert.isDefined(response, 'First refresh/read call to MongoDB API.');
-
-  // Verify that the expected status is 304.
-  expect(response.statusCode).to.equal(304);
-});
-```
-
-13. The final thing to do is to verify if the `Refresh` button is making the `/api/person` GET request correclty, so we click that button first:
-
-```js
-// Click the 'Refresh' button.
-cy.get('#refresh-entries').click();
-```
-
-14. And then we wait for the API request and verify it's status:
-
-```js
-// Wait for the API call that the 'Refresh' button has started and verify if it has the expected results.
-cy.wait('@refreshCheck').should(({response}) => {
-  assert.isDefined(response, 'Second refresh/read call to MongoDB API.');
-  expect(response.statusCode).to.equal(304);
-});
-```
+8. Run the previous test and you will see how it adds multiple people from our `people.json` fixtures.
 
 **Note:** _You can check all the files in this branch to see all the code changes we have made._

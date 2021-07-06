@@ -1,0 +1,16 @@
+[
+	{
+		"name": "Cypress test person",
+		"job": "Software tester",
+		"address": "Cypress av.",
+		"phone": 23840823,
+		"hasKids": true
+	},
+	{
+		"name": "Cypress Devops Person",
+		"job": "Devops Engineer",
+		"address": "CY st.",
+		"phone": 33982138,
+		"hasKids": false
+	}
+]
