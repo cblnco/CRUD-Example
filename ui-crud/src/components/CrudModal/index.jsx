@@ -11,6 +11,7 @@ import PersonService from '../../services/PersonService';
 import './CrudModal.scss';
 
 const CrudModal = ({
+	id = '',
 	title,
 	type,
 	primaryBtnText,
@@ -98,14 +99,14 @@ const CrudModal = ({
 	const { name, job, address, phone, hasKids } = personData;
 
 	return (
-		<ComposedModal open={isOpen} onClose={onClose}>
-			<ModalHeader title={title} />
-			<ModalBody hasForm>
+		<ComposedModal id={id} open={isOpen} onClose={onClose}>
+			<ModalHeader id={`${id}-header`} title={title} />
+			<ModalBody id={`${id}-body`} hasForm>
 				<div className='bx--grid bx--grid--full-width'>
 					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-8'>
 							<TextInput
-								id='person-name'
+								id={`${id}person-name`}
 								name='name'
 								data-modal-primary-focus
 								labelText='Name'
@@ -122,7 +123,7 @@ const CrudModal = ({
 					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-6'>
 							<TextInput
-								id='person-job'
+								id={`${id}person-job`}
 								name='job'
 								data-modal-primary-focus
 								labelText='Job'
@@ -136,7 +137,7 @@ const CrudModal = ({
 					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-9'>
 							<TextInput
-								id='person-address'
+								id={`${id}person-address`}
 								name='address'
 								data-modal-primary-focus
 								labelText='Address'
@@ -150,7 +151,7 @@ const CrudModal = ({
 					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-4'>
 							<TextInput
-								id='person-phone'
+								id={`${id}person-phone`}
 								type='number'
 								name='phone'
 								data-modal-primary-focus
@@ -168,7 +169,7 @@ const CrudModal = ({
 					<div className='bx--row crud-modal__row'>
 						<div className='bx--col-lg-3'>
 							<Checkbox
-								id='person-haskids'
+								id={`${id}person-haskids`}
 								name='hasKids'
 								title='Family information'
 								labelText='Do you have kids?'
