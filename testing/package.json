@@ -6,6 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": true,
+    "cucumberJson": {
+      "generate": true,
+      "outputFolder": "cypress/cucumber-json",
+      "filePrefix": "",
+      "fileSuffix": ".cucumber"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cblnco/CRUD-Example.git"
@@ -22,6 +31,10 @@
   },
   "homepage": "https://github.com/cblnco/CRUD-Example#readme",
   "dependencies": {
-    "cypress": "^7.6.0"
+    "cypress": "^7.6.0",
+    "cypress-cucumber-preprocessor": "^4.1.3"
+  },
+  "devDependencies": {
+    "cucumber-html-reporter": "^5.4.0"
   }
 }
