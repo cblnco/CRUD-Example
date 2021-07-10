@@ -169,10 +169,10 @@ node cucumber-reporter.js
 
 ## Helpful resources:
 
-* [Cypress API Documentation](https://docs.cypress.io/api/table-of-contents)
-* [Mochawesome Reporter](https://github.com/adamgruber/mochawesome)
-* [Cucumber Gherkin](https://cucumber.io/docs/gherkin/reference/)
-* [CSS Selectors Medium article/game](https://medium.com/design-code-repository/css-selectors-cheatsheet-details-9593bc204e3f)
-* [IBM's Enterprise Udemy website](https://ibm-learning.udemy.com/organization/home/)
+- [Cypress API Documentation](https://docs.cypress.io/api/table-of-contents)
+- [Mochawesome Reporter](https://github.com/adamgruber/mochawesome)
+- [Cucumber Gherkin](https://cucumber.io/docs/gherkin/reference/)
+- [CSS Selectors Medium article/game](https://medium.com/design-code-repository/css-selectors-cheatsheet-details-9593bc204e3f)
+- [IBM's Enterprise Udemy website](https://ibm-learning.udemy.com/organization/home/)
 
 **Note:** _You can check all the files in this branch to see all the code changes we have made._
