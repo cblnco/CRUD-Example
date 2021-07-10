@@ -24,6 +24,7 @@ it('Updates a previously created person.', () => {
 
 	cy.get('.app__person-row').contains(name).find('button:nth-child(1)').click();
 	cy.updatePerson(updatedPerson); //bx--structured-list-td
+
 	cy.get('.app__person-row')
 		.contains(updatedPerson.name)
 		.find('.bx--structured-list-td')
@@ -35,6 +36,7 @@ it('Updates a previously created person.', () => {
 			expect(uiAddress.innerText).to.be.equal(updatedPerson.address);
 			expect(uiHasKids.innerText === 'true').to.be.equal(updatedPerson.hasKids);
 		});
+
 	cy.deletePerson(updatedPerson);
 	cy.verifyIfPerson(updatedPerson, 'not.exist');
 });
